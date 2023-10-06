@@ -3,9 +3,10 @@
 fastp -i SampleName_R1.fq.gz -o clean.SampleName_R1.fq.gz -w 8 -a AAAAAAAAAA -f 3 -l 16 -h SampleName_R1.html -j SampleName_R1.json 
 
 #remove ncRNA
-bowtie2 --very-sensitive-local --no-unal -p 8 -x /xjlab/yxxu/reference/ath/ensembl_ncRNA/ath_ncRNA_bowtie2 -U ./cleandata/ABA-Col-0-1.clean.R1.fq.gz --un-gz ./rm_ncrna/ABA-Col-0-1.rRNArm.fq.gz 2> ./rm_ncrna/ABA-Col-0-1.Map2rRNAStat.xls | samtools view -@ 8 -bS -o ./rm_ncrna/ABA-Col-0-1.Map2rRNA.bam -
+bowtie2 --very-sensitive-local --no-unal -p 8 -x ./ensembl_ncRNA/ncRNA_bowtie2 -U clean.SampleName_R1.fq.gz --un-gz clean.ncRNArm.SampleName_R1.fq.gz 2> SampleName.Map2ncRNAStat.xls | samtools view -@ 8 -bS -o SampleName.Map2rRNA.bam -
+
 #mapping using STAR
-STAR --runThreadN 8 --genomeDir tair10_STARindex --readFilesIn clean.SampleName_R1.fq.gz clean.SampleName_R2.fq.gz --readFilesCommand zcat --outSAMtype BAM SortedByCoordinate --outFileNamePrefix SampleName
+STAR --runThreadN 8 --genomeDir tair10_STARindex --readFilesIn clean.ncRNArm.SampleName_R1.fq.gz --readFilesCommand zcat --outSAMtype BAM SortedByCoordinate --outFileNamePrefix SampleName
 
 #count using featureCount
 featureCounts -T 8 -t exon -p -P -B -C -g gene_id -a tair10.gtf -o SampleName.featurecount.txt SampleName.bam
