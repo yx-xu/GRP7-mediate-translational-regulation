@@ -6,7 +6,7 @@ fastp -i SampleName_R1.fq.gz -o clean.SampleName_R1.fq.gz -w 8 -a AAAAAAAAAA -f 
 bowtie2 --very-sensitive-local --no-unal -p 8 -x ./ensembl_ncRNA/ncRNA_bowtie2 -U clean.SampleName_R1.fq.gz --un-gz clean.ncRNArm.SampleName_R1.fq.gz 2> SampleName.Map2ncRNAStat.xls | samtools view -@ 8 -bS -o SampleName.Map2rRNA.bam -
 
 #mapping using STAR
-STAR --runThreadN 8 --genomeDir tair10_STARindex --readFilesIn clean.ncRNArm.SampleName_R1.fq.gz --readFilesCommand zcat --outSAMtype BAM SortedByCoordinate --outFileNamePrefix SampleName
+STAR --outFilterType BySJout --runThreadN 8 --outFilterMismatchNmax 2 --genomeDir tair10_STARindex --readFilesIn clean.ncRNArm.SampleName_R1.fq.gz --outFileNamePrefix SampleName --outSAMtype BAM SortedByCoordinate --quantMode TranscriptomeSAM GeneCounts --outFilterMultimapNmax 1 --outFilterMatchNmin 14 --alignEndsType EndToEnd --readFilesCommand zcat
 
 #count using featureCount
-featureCounts -T 8 -t exon -p -P -B -C -g gene_id -a tair10.gtf -o SampleName.featurecount.txt SampleName.bam
+featureCounts -T 8 -t exon -g gene_id -a tair10.gtf -o SampleName.featurecount.txt SampleName.bam 
